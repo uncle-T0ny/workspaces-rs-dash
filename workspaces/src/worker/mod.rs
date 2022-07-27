@@ -34,8 +34,8 @@ impl<T: fmt::Debug> fmt::Debug for Worker<T> {
 }
 
 /// Spin up a new sandbox instance, and grab a [`Worker`] that interacts with it.
-pub async fn sandbox() -> anyhow::Result<Worker<Sandbox>> {
-    Ok(Worker::new(Sandbox::new().await?))
+pub async fn sandbox(is_reset_state: bool) -> anyhow::Result<Worker<Sandbox>> {
+    Ok(Worker::new(Sandbox::new(is_reset_state).await?))
 }
 
 /// Connect to the [testnet](https://explorer.testnet.near.org/) network, and grab
@@ -73,7 +73,7 @@ where
     F: Fn(Worker<Sandbox>) -> T,
     T: core::future::Future,
 {
-    Ok(task(sandbox().await?).await)
+    Ok(task(sandbox(true).await?).await)
 }
 
 /// Run a locally scoped task where a [`testnet`] instanced [`Worker`] is supplied.
