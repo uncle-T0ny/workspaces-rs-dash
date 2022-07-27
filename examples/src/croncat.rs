@@ -47,7 +47,7 @@ pub struct Agent {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // Spawn sandbox as normal and get us a local blockchain for us to interact and toy with:
-    let worker = workspaces::sandbox().await?;
+    let worker = workspaces::sandbox(false).await?;
 
     // Initialize counter contract, which will be pointed to in the manager contract to schedule
     // a task later to increment the counter, inside counter contract.
