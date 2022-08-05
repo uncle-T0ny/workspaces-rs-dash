@@ -265,7 +265,7 @@ impl<'a, 'b, T: Network> CallTransaction<'a, 'b, T> {
     /// object and return us the execution details, along with any errors if the transaction
     /// failed in any process along the way.
     pub async fn transact(self) -> anyhow::Result<CallExecutionDetails> {
-        self.worker
+        let res = self.worker
             .client()
             .call(
                 &self.signer,
@@ -275,8 +275,17 @@ impl<'a, 'b, T: Network> CallTransaction<'a, 'b, T> {
                 self.function.gas,
                 self.function.deposit,
             )
-            .await
-            .and_then(CallExecutionDetails::from_outcome)
+            .await;
+
+        let is_log_transact = match std::env::var("IS_WORKSPACES_LOG_TRANSACT") {
+            Ok(s) => s.parse::<bool>()?,
+            Err(_) => false,
+        };
+
+        if is_log_transact {
+            println!("transact outcome: {:?}", res);
+        }
+        res.and_then(CallExecutionDetails::from_outcome)
     }
 
     /// Instead of transacting the transaction, call into the specified view function.
